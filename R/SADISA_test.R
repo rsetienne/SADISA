@@ -149,4 +149,5 @@ SADISA_test <- function(tol = 1E-6)
       cat('\nThe difference is:',result - fitresults$fit4.llikopt[[i]],'  ');
       testthat::expect_equal(result,fitresults$fit4.llikopt[[i]],tolerance = tol);
    }
+
 }
