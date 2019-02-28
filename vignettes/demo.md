@@ -1,7 +1,7 @@
 ---
 title: "Using SADISA"
 author: "Rampal S. Etienne"
-date: "2018-06-13"
+date: "2019-02-27"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{"Using SADISA"}

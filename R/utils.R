@@ -53,7 +53,16 @@ integral_peak <- function(logfun, xx = seq(-100,10,2), xcutoff = 2, ycutoff = 40
    }
 
    # 3/ compute integral
-   intfun <- function(x) exp((x + logfun(exp(x))) - ymax);
+   intfun <- function(x)
+   {
+      #if(any(is.nan(logfun(exp(x)))))
+      #{
+      #   print(exp(x))
+      #   print(logfun(exp(x)))
+      #   print(logfun)
+      #}
+      return(exp((x + logfun(exp(x))) - ymax))
+   }
    intres <- stats::integrate(f = intfun, lower = xlft, upper = xrgt, rel.tol = 1e-10, abs.tol = 1e-10);
    corrfact <- intres$value;
    logQ <- ymax + log(corrfact);
@@ -111,9 +120,13 @@ difgamln <- function(a,n)
    {
       stop('Input arguments should have same length.')
    }
+   if(min(a) < 0)
+   {
+      stop('The first argument of difgamln must be non-negative.')
+   }
    if(min(n) < 0)
    {
-      stop('The second argument must be non-negative.')
+      stop('The second argument of difgamln must be non-negative.')
    }
    cvec <- rep(0,length(a));
    for(ctr in 1:length(a))
@@ -174,4 +187,52 @@ checkiijj <- function(ii,jj,mult)
    return(list(ii = ii,jj = jj))
 }
 
+dec2bin <- function(y,ly)
+{
+   stopifnot(length(y) == 1, mode(y) == 'numeric')
+   q1 <- (y / 2) %/% 1
+   r <- y - q1 * 2
+   res <- c(r)
+   while(q1 >= 1)
+   {
+      q2 <- (q1 / 2) %/% 1
+      r <- q1 - q2 * 2
+      q1 <- q2
+      res <- c(r, res)
+   }
+   res <- c(rep(0,ly - length(res)),res)
+   return(res)
+}
 
+dec2binmat <- function(y)
+{
+   numrows <- 2^y
+   res <- matrix(0,numrows,y)
+   for(i in 0:(numrows-1))
+   {
+      res[i + 1,] <- dec2bin(i,y)
+   }
+   return(res)
+}
+
+is.nonnegativewholenumber <- function(x, tol = .Machine$double.eps^0.5)
+{
+   ans <- abs(x - DDD::roundn(x)) < tol & x >= 0
+   if(any(is.na(ans)))
+   {
+      ans <- FALSE
+   }
+   return(all(ans))
+}
+
+logminexpm1approx <- function(iiqq,xcnt,be)
+{
+   if(abs(-iiqq * xcnt^be) < 1E-100)
+   {
+      ans <- log(iiqq) + be * log(xcnt)
+   } else
+   {
+      ans <- log(-expm1(-iiqq * xcnt^be))
+   }
+   return(ans)
+}

@@ -4,7 +4,10 @@
 \alias{SADISA_test}
 \title{Tests SADISA for data sets included in the paper by Haegeman & Etienne}
 \usage{
-SADISA_test(tol = 1e-06)
+SADISA_test(tol = 0.001)
+}
+\arguments{
+\item{tol}{tolerance of the test}
 }
 \description{
 Tests SADISA for data sets included in the paper by Haegeman & Etienne

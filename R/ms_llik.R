@@ -18,14 +18,20 @@ ms_llik <- function(pars,sf,model)
       ii <- pars[3:length(pars)];
       ms_estot <- dddlms_estot;
       checkpars <- log(c(pars[1],ii));
-      if(pars[2] < -10 || pars[2] > 0.999)
+      if(pars[2] < -10 | pars[2] > 0.99)
       {
          warning('alpha value is larger than 1 or very negative.')
          llik <- -Inf;
          return(llik);
       }
    }
-   if(sum(checkpars < -20) || sum(checkpars > 20))
+   if(any(is.na(checkpars) | is.nan(checkpars)))
+   {
+      warning('One or more parameter values are not numbers.')
+      llik <- -Inf;
+      return(llik)
+   }
+   if(any(checkpars < -20 | checkpars > 20))
    {
       llik <- -Inf;
       return(llik);
@@ -190,6 +196,15 @@ pmdlms_lesk_int <- function(x,pars,qq,k)
 {
    th <- pars[1];
    ii <- pars[2:length(pars)];
+   if(min(ii) < 0)
+   {
+      stop('ii must be non-negative.')
+   }
+   if(min(x) < 0)
+   {
+      stop('x must be non-negative.')
+   }
+
    y <- rep(0,length(x));
    for(cnt in 1:length(x))
    {

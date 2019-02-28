@@ -27,6 +27,7 @@ mdd_lesk_int <- function(x,pars,qq,k)
          if(k > 1)
          {
             y[cnt] <- sum(log(ii * x[cnt]^be + (1:(k - 1))));
+            #if(any(is.nan(y))) { print(k); print(x); print(y)}
          } else
          {
             y[cnt] <- 0;
@@ -67,7 +68,8 @@ mdd_lestot_int <- function(x,pars,qq)
       {
          if(x[cnt] > 0)
          {
-            y[cnt] <- log(-expm1(-iiqq * x[cnt]^be)) - log(x[cnt]^be) - th * x[cnt]^be;
+            y[cnt] <- logminexpm1approx(iiqq,x[cnt],be) - be * log(x[cnt]) - th * x[cnt]^be;
+            #y[cnt] <- log(-expm1(-iiqq * xcnt^be)) - be * log(x[cnt]) - th * x[cnt]^be;
          } else
          {
             y[cnt] <- log(iiqq);
@@ -81,7 +83,8 @@ mdd_lestot_int <- function(x,pars,qq)
       {
          if(x[cnt] > 0)
          {
-            y[cnt] <- log(-expm1(-iiqq * x[cnt])) - (1 + al) * log(x[cnt]) - th * x[cnt];
+            y[cnt] <- logminexpm1approx(iiqq,x[cnt],1) - (1 + al) * log(x[cnt]) - th * x[cnt];
+           #y[cnt] <- log(-expm1(-iiqq * x[cnt])) - (1 + al) * log(x[cnt]) - th * x[cnt];
          } else
          {
             y[cnt] <- -Inf;
@@ -94,7 +97,8 @@ mdd_lestot_int <- function(x,pars,qq)
       {
          if(x[cnt] > 0)
          {
-            y[cnt] <- log(-expm1(-iiqq * x[cnt])) - log(x[cnt]) - th * x[cnt];
+            y[cnt] <- logminexpm1approx(iiqq,x[cnt],1) - log(x[cnt]) - th * x[cnt];
+            #y[cnt] <- log(-expm1(-iiqq * x[cnt])) - log(x[cnt]) - th * x[cnt];
          } else
          {
             y[cnt] <- log(iiqq);

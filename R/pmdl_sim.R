@@ -26,7 +26,7 @@
 #' @export
 pmdl_sim <- function(th,ii,jj,mult = 'single',nsim = 1)
 {
-   if(!is.numeric(th) || length(th) > 1)
+   if(!is.numeric(th) | length(th) > 1)
    {
       stop('th should be a single scalar.')
    }

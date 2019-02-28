@@ -5,8 +5,9 @@
 \title{Performs maximum likelihood parameter estimation for requested model}
 \usage{
 SADISA_ML(abund, initpars, idpars, labelpars, model = c("pm", "dl"),
-  mult = "single", tol = c(1e-06, 1e-06, 1e-06), maxiter = 1000 *
-  round((1.25)^sum(idpars)), optimmethod = "subplex")
+  mult = "single", tol = c(1e-06, 1e-06, 1e-06), maxiter = min(1000 *
+  round((1.25)^sum(idpars)), 1e+05), optimmethod = "subplex",
+  num_cycles = 1)
 }
 \arguments{
 \item{abund}{abundance vector or a list of abundance vectors.
@@ -45,6 +46,8 @@ When set to 'ms' the loglikelihood for multiple samples from the same metacommun
 \item{maxiter}{sets the maximum number of iterations}
 
 \item{optimmethod}{sets the optimization method to be used, either subplex (default) or an alternative implementation of simplex.}
+
+\item{num_cycles}{the number of cycles of opimization. If set at Inf, it will do as many cycles as needed to meet the tolerance set for the target function.}
 }
 \description{
 Computes maximum loglikelihood and corresponding parameters for the requested model using the independent-species approach.

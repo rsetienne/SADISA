@@ -34,7 +34,7 @@
 #' @export
 SADISA_sim <- function(parsmc,ii,jj,model = c('pm','dl'),mult = 'single',nsim = 1)
 {
-   if(!((model[1] == 'pm' || model[1] == 'pr' || model[1] == 'dd') && model[2] == 'dl'))
+   if(!((model[1] == 'pm' | model[1] == 'pr' | model[1] == 'dd') & model[2] == 'dl'))
    {
       stop('Simulations for this metacommunity model is not implemented yet.');
    }
@@ -94,6 +94,7 @@ SADISA_sim <- function(parsmc,ii,jj,model = c('pm','dl'),mult = 'single',nsim = 
                jj2 <- c(jj2,jj[[s]][[g]]);
             }
             qq <- jj2/(ii2 + jj2);
+            #cat(paste('Simulation ', i,' and guild ',g,sep = '')); cat('\n');
             #out[[i]][[g]] <- pmdlmult_sim(th,ii2,qq);
             out[[i]][[g]] <- ms_sim(parsmc,ii2,qq,model);
          }
@@ -123,17 +124,17 @@ ms_sim <- function(parsmc,ii,qq,model)
 {
    if(model[1] == 'pm')
    {
-      if(parsmc < 0 || min(unlist(ii)) < 0) stop('Parameters should be positive');
+      if(parsmc < 0 | min(unlist(ii)) < 0) stop('Parameters should be positive');
       model_es0_int <- pm_estot_int;
    } else
    if(model[1] == 'pr')
    {
-      if(parsmc < 0 || min(unlist(ii)) < 0) stop('Parameters should be positive');
+      if(parsmc < 0 | min(unlist(ii)) < 0) stop('Parameters should be positive');
       model_es0_int <- pr_estot_int;
    } else
    if(model[1] == 'dd')
    {
-      if(parsmc[1] < 0 || parsmc[2] > 1 || min(unlist(ii)) < 0) stop('Parameters, except alpha, should be positive; alpha cannot be larger than 1.');
+      if(parsmc[1] < 0 | parsmc[2] > 1 | min(unlist(ii)) < 0) stop('Parameters, except alpha, should be positive; alpha cannot be larger than 1.');
       model_es0_int <- dd_estot_int;
    }
 
@@ -143,7 +144,6 @@ ms_sim <- function(parsmc,ii,qq,model)
       return(exp(model_es0_int(x,parsmc,ii,qq)))
    }
    es0 <- stats::integrate(f = ff,lower = 0,upper = 1,rel.tol = 1e-9,abs.tol = 0)$value;
-   #print(es0)
    nx <- stats::rpois(n = length(es0),es0);
    xs <- rep(0,nx);
    for(cnt in 1:nx)
@@ -158,6 +158,7 @@ ms_sim <- function(parsmc,ii,qq,model)
          }
          return(intresult);
       }
+      #cat(paste('Compute xs[',cnt,']\n',sep = ''))
       xs[cnt] <- stats::uniroot(f = ff2,interval = c(0,1),tol = .Machine$double.eps)$root;
    }
    if(model[1] == 'dd' && parsmc[2] > 0) # this is alpha
@@ -168,17 +169,51 @@ ms_sim <- function(parsmc,ii,qq,model)
    # sample local community abundances
    M <- length(ii);
    fasim <- matrix(0,nrow = nx, ncol = M);
+
+   configs <- dec2binmat(M)
    for(ctr in 1:nx)
    {
       nn <- ii * xs[ctr]
-      kk <- stats::rnbinom(n = nn,size = nn, prob = 1 - qq);
-      while(sum(kk) == 0)
-      {
-         kk <- stats::rnbinom(n = nn,size = nn, prob = 1 - qq);
-      }
+      kk <- stats::rnbinom(n = M,size = nn, prob = 1 - qq);
       fasim[ctr,] <- kk;
+      if(sum(kk) == 0)
+      {
+         p0 <- stats::dnbinom(x = 0, size = nn, prob = 1 - qq)
+         p <- rep(0,2^M - 1)
+         for(i in 2:(2^M))
+         {
+            p[i - 1] <- prod(p0^(1 - configs[i,]) * (1 - p0)^configs[i,])
+         }
+         config_possible <- which(c(0,p) != 0)
+         if(length(config_possible) == 0)
+         {
+            totsam <- rowSums(configs)
+            config_possible <- which(totsam == 1)
+            p <- rep(1,length(config_possible))
+         } else
+         {
+            p <- p[config_possible - 1]
+         }
+         config_sampled <- configs[DDD::sample2(config_possible,size = 1,prob = p),]
+         samples_present <- which(config_sampled == 1)
+         for(i in samples_present)
+         {
+            fele <- stats::runif(n = 1, min = stats::dnbinom(0, size = nn[i], prob = 1 - qq[i]), max = 1)
+            fasim[ctr,i] <- stats::qnbinom(fele, size = nn[i], prob = 1 - qq[i])
+            if(fasim[ctr,i] <= 0 | fasim[ctr,i] == Inf | is.na(fasim[ctr,i]) | is.nan(fasim[ctr,i]))
+            {
+               nmax <- 1000000
+               probs <- stats::dnbinom(1:nmax, size = nn[i], prob = 1 - qq[i])
+               which0 <- which(probs <= 0)
+               if(length(which0) > 0)
+               {
+                  nmax <- min(which0) - 1
+               }
+               fasim[ctr,i] <- DDD::sample2(x = 1:nmax, size = 1, prob = probs[1:nmax])
+            }
+         }
+      }
    }
-
    #sfsim <- convert_fa2sf(fasim);
    fasim <- t(fasim);
    ff <- list();

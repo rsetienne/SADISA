@@ -32,6 +32,7 @@
 #' @param tol a vector containing three numbers for the relative tolerance in the parameters, the relative tolerance in the function, and the absolute tolerance in the parameters.
 #' @param maxiter sets the maximum number of iterations
 #' @param optimmethod sets the optimization method to be used, either subplex (default) or an alternative implementation of simplex.
+#' @param num_cycles the number of cycles of opimization. If set at Inf, it will do as many cycles as needed to meet the tolerance set for the target function.
 #' @keywords model species-abundance-distribution
 #' @references Haegeman, B. & R.S. Etienne (2017). A general sampling formula for community structure data. Methods in Ecology & Evolution 8: 1506-1519. doi: 10.1111/2041-210X.12807
 #' @examples
@@ -56,13 +57,38 @@ SADISA_ML <- function(
    model = c('pm','dl'),
    mult = 'single',
    tol = c(1E-6, 1E-6, 1E-6),
-   maxiter = 1000 * round((1.25)^sum(idpars)),
-   optimmethod = 'subplex'
+   maxiter = min(1000 * round((1.25)^sum(idpars)),100000),
+   optimmethod = 'subplex',
+   num_cycles = 1
    )
 {
+   if(!(is.nonnegativewholenumber(maxiter) && maxiter > 0))
+   {
+      stop('The number of iterations should be positive.')
+   }
    if(mult != 'single' && !is.list(labelpars))
    {
       stop('The labels of the parameters should be in a list when there are multiple samples or guilds.')
+   }
+   dim_abund <- NULL
+   dim_labelpars <- NULL
+   abundff <- abund
+   labelparsff <- labelpars
+   for(i in 1:4)
+   {
+      dim_abund[i] <- length(abundff)
+      dim_labelpars[i] <- length(labelparsff)
+      abundff <- abundff[[1]]
+      labelparsff <- labelparsff[[1]]
+   }
+   rm(abundff,labelparsff)
+   #print(dim_abund)
+   #print(dim_labelpars)
+   depth_abund <- min(which(dim_abund == 1))
+   depth_labelpars <- min(which(dim_labelpars == 1))
+   if(depth_abund != depth_labelpars)
+   {
+      stop('The abundance data and the parameter labels do not match.')
    }
    initpars <- DDD::transform_pars(initpars);
    if(!is.null(which(idpars == 1)))
@@ -90,7 +116,7 @@ SADISA_ML <- function(
       return(out);
    } else {
       optimpars <- c(tol,maxiter);
-      out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,fun = SADISA_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idpars = idpars,labelpars = labelpars,abund = abund,model = model,mult = mult);
+      out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,num_cycles = num_cycles,fun = SADISA_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idpars = idpars,labelpars = labelpars,abund = abund,model = model,mult = mult);
    }
    if(out$conv != 0)
    {
@@ -118,14 +144,14 @@ SADISA_loglik_choosepar <- function(trparsopt,trparsfix,idpars,labelpars,abund,m
    }
    trpars1 <- make_list_of_pars(trparsopt,trparsfix,idpars,labelpars)
    unlisttrpars1 <- unlist(trpars1);
-   if(max(unlisttrpars1) > 1 || min(unlisttrpars1) < -(model[1] == 'dd'))
+   if(max(unlisttrpars1) > 1 | min(unlisttrpars1) < -(model[1] == 'dd'))
    {
       loglik = -Inf;
       return(loglik);
    } else {
       pars <- untransform_list_of_pars(trpars1)
       loglik <- SADISA_loglik(abund = abund, pars = pars, model = model, mult = mult);
-      if(is.nan(loglik) || is.na(loglik))
+      if(is.nan(loglik) | is.na(loglik))
       {
          cat("There are parameter values which cause numerical problems.\n")
          loglik <- -Inf;
