@@ -87,7 +87,7 @@ SADISA_test <- function(tol = 1E-3)
       po <- fitresults$fit7.parsopt[[i]];
       result <- SADISA_loglik(abund = nn,pars = po,model = c('pm','dd'));
       #cat('\nThe difference is:',result - fitresults$fit7.llikopt[[i]],'  ');
-      testthat:: expect_equal(result,fitresults$fit7.llikopt[[i]],tolerance = tol);
+      testthat::expect_equal(result,fitresults$fit7.llikopt[[i]],tolerance = tol);
    }
 
    cat('\n\nTesting large data sets (Table S3):\n');

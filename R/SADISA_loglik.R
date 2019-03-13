@@ -224,9 +224,8 @@ model_llik <- function(model,pars,nn,nu,ss)
          return(llik);
       }
    }
-   logpars <- log(pars);
-   logpars2 <- logpars[!is.nan(logpars) & logpars != -Inf];
-   if(min(logpars2) < -20 | max(logpars2) > 20)
+   logpars <- log(pars[pars > 0]);
+   if(min(logpars) < -20 | max(logpars) > 20)
    {
       llik <- -Inf;
       return(llik);
