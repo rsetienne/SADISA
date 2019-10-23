@@ -10,7 +10,7 @@ LazyData: FALSE
 RoxygenNote: 6.1.1
 Encoding: UTF-8
 Depends: R (>= 3.5)
-Imports: pracma, DDD
-Suggests: testthat, knitr, rmarkdown
+Imports: pracma, DDD (>= 4.1)
+Suggests: testthat, knitr, rmarkdown,
 VignetteBuilder: knitr
 NeedsCompilation: no
