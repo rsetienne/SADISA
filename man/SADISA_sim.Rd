@@ -4,8 +4,7 @@
 \alias{SADISA_sim}
 \title{Simulates species abundance data}
 \usage{
-SADISA_sim(parsmc, ii, jj, model = c("pm", "dl"), mult = "single",
-  nsim = 1)
+SADISA_sim(parsmc, ii, jj, model = c("pm", "dl"), mult = "single", nsim = 1)
 }
 \arguments{
 \item{parsmc}{The model parameters. For the point mutation (pm) model this is theta and I. For the protracted

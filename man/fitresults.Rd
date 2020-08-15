@@ -4,7 +4,9 @@
 \name{fitresults}
 \alias{fitresults}
 \title{Maximum likelihood estimates and corresponding likelihood values for various fits to various tropical forest communities}
-\format{A list of 20 lists, each containing either likelihood values or the corresponding parameter estimates. See description.}
+\format{
+A list of 20 lists, each containing either likelihood values or the corresponding parameter estimates. See description.
+}
 \source{
 Condit et al. (2002). Beta-diversity in tropical forest trees. Science 295: 666-669.
 }

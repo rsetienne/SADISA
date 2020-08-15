@@ -4,8 +4,13 @@
 \alias{integral_peak}
 \title{Computes integral of a very peaked function}
 \usage{
-integral_peak(logfun, xx = seq(-100, 10, 2), xcutoff = 2,
-  ycutoff = 40, ymaxthreshold = 1e-12)
+integral_peak(
+  logfun,
+  xx = seq(-100, 10, 2),
+  xcutoff = 2,
+  ycutoff = 40,
+  ymaxthreshold = 1e-12
+)
 }
 \arguments{
 \item{logfun}{the logarithm of the function to integrate}

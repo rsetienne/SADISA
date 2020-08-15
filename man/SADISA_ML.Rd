@@ -4,10 +4,18 @@
 \alias{SADISA_ML}
 \title{Performs maximum likelihood parameter estimation for requested model}
 \usage{
-SADISA_ML(abund, initpars, idpars, labelpars, model = c("pm", "dl"),
-  mult = "single", tol = c(1e-06, 1e-06, 1e-06), maxiter = min(1000 *
-  round((1.25)^sum(idpars)), 1e+05), optimmethod = "subplex",
-  num_cycles = 1)
+SADISA_ML(
+  abund,
+  initpars,
+  idpars,
+  labelpars,
+  model = c("pm", "dl"),
+  mult = "single",
+  tol = c(1e-06, 1e-06, 1e-06),
+  maxiter = min(1000 * round((1.25)^sum(idpars)), 1e+05),
+  optimmethod = "subplex",
+  num_cycles = 1
+)
 }
 \arguments{
 \item{abund}{abundance vector or a list of abundance vectors.
