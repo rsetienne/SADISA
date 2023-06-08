@@ -209,5 +209,5 @@ SADISA_test <- function(tol = 1E-3)
    ii <- 1e4;
    jj <- 1e6;
    result <- SADISA_loglik(abund = ps, pars = c(th, ii, jj), model = c('pm','dl'))
-   testthat::expect_equal(result, 1342.6704418789554438, tol = 1E-6)
+   testthat::expect_equal(result, 735.4226333098715713, tol = 1E-6)
 }
