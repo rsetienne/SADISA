@@ -55,7 +55,7 @@ SADISA_loglik <- function(
    {
       stop('The list of abundances has a different dimension than the list of parameters.');
    }
-   loglik = 0;
+   loglik <- 0;
    if(mult == 'mg' | mult == 'single')
    {
       for(i in 1:length(abund))
@@ -66,11 +66,19 @@ SADISA_loglik <- function(
             nn <- nn[-which(nn == 0)];
          }
          nu <- sort(unique(nn));
-         if(!is.nonnegativewholenumber(nu))
-         {
-            stop('The abundances should be non-negative integers.')
-         }
          ss <- pracma::histc(nn,nu)$cnt;
+         rel_abund <- FALSE;
+         if(!all(nu == round(nu))) {
+            message('The package is experimental for relative abundances.')
+            rel_abund <- TRUE;
+            if(any(nu >= 1) | any(nu <= 0)) {
+               stop('Relative abundances should be between 0 and 1.')
+            }
+         }
+         if(any(nu <= 0))
+         {
+            stop('The abundances should be non-negative.')
+         }
          loglik <- loglik + model_llik(model = model, pars = pars[[i]], nn = nn, nu = nu, ss = ss);
       }
    } else # multiple samples
@@ -164,7 +172,7 @@ SADISA_loglik <- function(
          }
       }
    }
-   if(loglik > 0)
+   if(loglik > 0 && !rel_abund)
    {
       stop('The loglikelihood is larger than 0. This is probably due to a numerical problem.')
    }
@@ -174,12 +182,17 @@ SADISA_loglik <- function(
 model_llik <- function(model,pars,nn,nu,ss)
 {
    llik <- 0;
-   if(model[1] == 'pm' & model[2] == 'dl')
+   if(!all(nu == round(nu))) {
+      rel_abund <- TRUE
+   } else {
+      rel_abund <- FALSE
+   }
+   if(model[1] == 'pm' & model[2] == 'dl' & !rel_abund)
    {
       model_estot <- pm_estot;
       model_lesk <- pm_lesk;
    } else
-   if(model[1] == 'pmc' & model[2] == 'dl')
+   if(model[1] == 'pmc' & model[2] == 'dl' & !rel_abund)
    {
       j <- sum(nn);
       qq <- j/(pars[length(pars)] + j);
@@ -188,32 +201,36 @@ model_llik <- function(model,pars,nn,nu,ss)
       model_estot <- pm_estot;
       model_lesk <- pm_lesk;
    } else
-   if(model[1] == 'rf' & model[2] == 'dl')
+   if(model[1] == 'rf' & model[2] == 'dl' & !rel_abund)
    {
       model_estot <- rf_estot;
       model_lesk <- rf_lesk;
    } else
-   if(model[1] == 'dd' & model[2] == 'dl')
+   if(model[1] == 'dd' & model[2] == 'dl' & !rel_abund)
    {
       model_estot <- mdd_estot;
       model_lesk <- mdd_lesk;
    } else
-   if(model[1] == 'pr' & model[2] == 'dl')
+   if(model[1] == 'pr' & model[2] == 'dl' & !rel_abund)
    {
       model_estot <- pr_estot;
       model_lesk <- pr_lesk;
    } else
-   if(model[1] == 'pm' & model[2] == 'dd')
+   if(model[1] == 'pm' & model[2] == 'dd' & !rel_abund)
    {
       model_estot <- ldd_estot;
       model_lesk <- ldd_lesk;
+   } else
+   if(model[1] == 'pm' & model[2] == 'dl' & rel_abund) {
+      model_estot <- pm_estot_rel;
+      model_lesk <- pm_lesk_rel;
    } else
    {
       stop('The chosen combination of metacommunity model and local community model has not yet been implemented.');
       llik <- NA;
       return(llik);
    }
-   if(model[1] == 'dd' | model[2] == 'dd')
+   if(model[1] == 'dd' | model[2] == 'dd' & !rel_abund)
    {
       al <- pars[2];
       if(al < -10 | al > 0.99)
@@ -229,8 +246,8 @@ model_llik <- function(model,pars,nn,nu,ss)
       llik <- -Inf;
       return(llik);
    }
-   j <- sum(nn);
-   qq <- j/(pars[length(pars)] + j);
+   j <- ifelse(rel_abund,pars[length(pars)],sum(nn));
+   qq <- ifelse(rel_abund,j,j/(pars[length(pars)] + j));
    if(model[2] == 'dd')
    {
       funzero <- function(x) ldd_ejtot(pars = pars,qq = x) - j;
@@ -247,6 +264,6 @@ model_llik <- function(model,pars,nn,nu,ss)
    {
       lesk[cnt] <- model_lesk(pars,qq,k = nu[cnt]);
    }
-   llik <- llik - estot + sum(ss * lesk) - sum(lgamma(ss + 1));
+   llik <- llik - estot + sum(ss * lesk) - (!rel_abund) * sum(lgamma(ss + 1));
    return(llik);
 }

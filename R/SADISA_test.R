@@ -202,4 +202,12 @@ SADISA_test <- function(tol = 1E-3)
          testthat::expect_equal(result,llik[i,k],tolerance = tol);
       }
    }
+
+   cat('\n\nTesting for relative abundances (new):\n');
+   ps <- 10^(seq(from = -10,to = -1,length.out = 100));
+   th <- 1e2;
+   ii <- 1e4;
+   jj <- 1e6;
+   result <- SADISA_loglik(abund = ps, pars = c(th, ii, jj), model = c('pm','dl'))
+   testthat::expect_equal(result, 1342.6704418789554438, tol = 1E-6)
 }

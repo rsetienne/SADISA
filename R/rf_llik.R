@@ -1,7 +1,7 @@
 rf_estot <- function(pars,qq)
 {
-   ph = pars[1];
-   ii = pars[2];
+   ph <- pars[1];
+   ii <- pars[2];
    estot <- -ii * ph * log(1 - qq)/(ph - ii * log(1 - qq));
    return(estot);
 }
@@ -15,8 +15,8 @@ rf_lesk <- function(pars,qq,k)
 
 rf_lesk_int <- function(x,pars,qq,k)
 {
-   ph = pars[1];
-   ii = pars[2];
+   ph <- pars[1];
+   ii <- pars[2];
    y <- rep(0,length(x));
    for(cnt in 1:length(x))
    {
