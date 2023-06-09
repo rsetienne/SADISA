@@ -69,7 +69,7 @@ SADISA_loglik <- function(
          ss <- pracma::histc(nn,nu)$cnt;
          rel_abund <- FALSE;
          if(!all(nu == round(nu))) {
-            message('The package is experimental for relative abundances.')
+            #message('The package is experimental for relative abundances.')
             rel_abund <- TRUE;
             if(any(nu >= 1) | any(nu <= 0)) {
                stop('Relative abundances should be between 0 and 1.')

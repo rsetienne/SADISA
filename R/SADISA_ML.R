@@ -91,7 +91,7 @@ SADISA_ML <- function(
       stop('The abundance data and the parameter labels do not match.')
    }
    initpars <- DDD::transform_pars(initpars);
-   if(!is.null(which(idpars == 1)))
+      if(!is.null(which(idpars == 1)))
    {
       trparsopt <- initpars[which(idpars == 1)];
    } else
@@ -131,8 +131,8 @@ SADISA_ML <- function(
    pars <- make_list_of_pars(MLpars,parsfix,idpars,labelpars)
    out <- list(pars = pars, loglik = ML, conv = unlist(out$conv));
    cat('\nParameters after likelihood maximization:\n');
-   print(pars);
-   cat('\nMaximum loglikelihood:\n',ML,'\n\n');
+   cat(pars);
+   cat('\nMaximum loglikelihood:\n',ML,'\n\n',sep = '');
    return(out);
 }
 
@@ -157,6 +157,7 @@ SADISA_loglik_choosepar <- function(trparsopt,trparsfix,idpars,labelpars,abund,m
          loglik <- -Inf;
          return(loglik);
       }
+      #print(c(pars,loglik))
    }
    return(loglik);
 }

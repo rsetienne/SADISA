@@ -13,7 +13,7 @@
 #' @references Haegeman, B. & R.S. Etienne (2017). A general sampling formula for community structure data. Methods in Ecology & Evolution. In press.
 #' @export
 
-integral_peak <- function(logfun, xx = seq(-100,10,2), xcutoff = 2, ycutoff = 40, ymaxthreshold = 1E-12)
+integral_peak <- function(logfun, xx = seq(-100,0,2), xcutoff = 2, ycutoff = 40, ymaxthreshold = 1E-12)
 {
    # 1/ determine integrand peak
    yy <- xx + logfun(exp(xx));
@@ -63,7 +63,7 @@ integral_peak <- function(logfun, xx = seq(-100,10,2), xcutoff = 2, ycutoff = 40
       #}
       return(exp((x + logfun(exp(x))) - ymax))
    }
-   intres <- stats::integrate(f = intfun, lower = xlft, upper = xrgt, rel.tol = 1e-10, abs.tol = 1e-10);
+   intres <- stats::integrate(f = intfun, lower = xlft, upper = xrgt, rel.tol = 1e-12, abs.tol = 1e-20);
    corrfact <- intres$value;
    logQ <- ymax + log(corrfact);
    return(logQ);
