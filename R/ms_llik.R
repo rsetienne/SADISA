@@ -1,5 +1,6 @@
-ms_llik <- function(pars,sf,model)
+ms_llik <- function(pars,sf,model,apl)
 {
+   #Approximation_level not yet implemented for multiple samples
    N <- dim(sf)[1];
    Mp <- dim(sf)[2];
    M <- Mp - 1;

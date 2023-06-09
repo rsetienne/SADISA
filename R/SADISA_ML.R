@@ -29,6 +29,8 @@
 #' @details Not all combinations of metacommunity model and local community model have been implemented yet.
 #' because this requires checking for numerical stability of the integration. The currently available model combinations are, for a single sample, c('pm','dl'), c('pm','rf'), c('dd','dl'),
 #' c('pr','dl'), c('pm','dd'), and for multiple samples, c('pm','dl').
+#' @param approximation_level Length of abundance vector at which approximation should be used to speed up
+#' calculations. Default = Inf, so no approximation is used.
 #' @param tol a vector containing three numbers for the relative tolerance in the parameters, the relative tolerance in the function, and the absolute tolerance in the parameters.
 #' @param maxiter sets the maximum number of iterations
 #' @param optimmethod sets the optimization method to be used, either subplex (default) or an alternative implementation of simplex.
@@ -56,6 +58,7 @@ SADISA_ML <- function(
    labelpars,
    model = c('pm','dl'),
    mult = 'single',
+   approximation_level = Inf,
    tol = c(1E-6, 1E-6, 1E-6),
    maxiter = min(1000 * round((1.25)^sum(idpars)),100000),
    optimmethod = 'subplex',
@@ -106,7 +109,7 @@ SADISA_ML <- function(
    {
       trparsfix <- NULL;
    }
-   initloglik <- SADISA_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idpars = idpars,labelpars = labelpars,abund = abund,model = model,mult = mult);
+   initloglik <- SADISA_loglik_choosepar(trparsopt = trparsopt,trparsfix = trparsfix,idpars = idpars,labelpars = labelpars,abund = abund,model = model,mult = mult, apl = approximation_level);
    cat("The loglikelihood for the initial parameter values is ",initloglik,".\n",sep = '');
    utils::flush.console();
    if(initloglik == -Inf)
@@ -116,7 +119,7 @@ SADISA_ML <- function(
       return(out);
    } else {
       optimpars <- c(tol,maxiter);
-      out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,num_cycles = num_cycles,fun = SADISA_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idpars = idpars,labelpars = labelpars,abund = abund,model = model,mult = mult);
+      out <- DDD::optimizer(optimmethod = optimmethod,optimpars = optimpars,num_cycles = num_cycles,fun = SADISA_loglik_choosepar,trparsopt = trparsopt,trparsfix = trparsfix,idpars = idpars,labelpars = labelpars,abund = abund,model = model,mult = mult, apl = approximation_level);
    }
    if(out$conv != 0)
    {
@@ -136,7 +139,7 @@ SADISA_ML <- function(
    return(out);
 }
 
-SADISA_loglik_choosepar <- function(trparsopt,trparsfix,idpars,labelpars,abund,model,mult)
+SADISA_loglik_choosepar <- function(trparsopt,trparsfix,idpars,labelpars,abund,model,mult,apl)
 {
    if(!is.list(abund))
    {
@@ -150,7 +153,7 @@ SADISA_loglik_choosepar <- function(trparsopt,trparsfix,idpars,labelpars,abund,m
       return(loglik);
    } else {
       pars <- untransform_list_of_pars(trpars1)
-      loglik <- SADISA_loglik(abund = abund, pars = pars, model = model, mult = mult);
+      loglik <- SADISA_loglik(abund = abund, pars = pars, model = model, mult = mult, approximation_level = apl);
       if(is.nan(loglik) | is.na(loglik))
       {
          cat("There are parameter values which cause numerical problems.\n")

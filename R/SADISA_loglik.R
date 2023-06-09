@@ -20,6 +20,8 @@
 #' When set to 'mg' the loglikelihood for multiple guilds is computed.
 #' When set to 'ms' the loglikelihood for multiple samples from the same metacommunity is computed.
 #' When set to 'both' the loglikelihood for multiple guilds within multiple samples is computed.
+#' @param approximation_level Length of abundance vector at which approximation should be used to speed up
+#' calculations. Default = Inf, so no approximation is used.
 #' @return loglikelihood
 #' @details Not all combinations of metacommunity model and local community model have been implemented yet.
 #' because this requires checking for numerical stability of the integration. The currently available model combinations are, for a single sample, c('pm','dl'), c('pm','rf'), c('dd','dl'),
@@ -40,7 +42,8 @@ SADISA_loglik <- function(
    abund,
    pars,
    model,
-   mult = 'single'
+   mult = 'single',
+   approximation_level = Inf
    )
 {
    if(!is.list(abund))
@@ -79,7 +82,7 @@ SADISA_loglik <- function(
          {
             stop('The abundances should be non-negative.')
          }
-         loglik <- loglik + model_llik(model = model, pars = pars[[i]], nn = nn, nu = nu, ss = ss);
+         loglik <- loglik + model_llik(model = model, pars = pars[[i]], nn = nn, nu = nu, ss = ss, apl = approximation_level);
       }
    } else # multiple samples
    {
@@ -168,7 +171,7 @@ SADISA_loglik <- function(
                   parsnew <- c(parsnew,pars[[cc]][3]);
                }
             }
-            loglik <- loglik + ms_llik(pars = parsnew,sf = sf,model = model);
+            loglik <- loglik + ms_llik(pars = parsnew,sf = sf,model = model, apl = approximation_level);
          }
       }
    }
@@ -179,7 +182,7 @@ SADISA_loglik <- function(
    return(loglik);
 }
 
-model_llik <- function(model,pars,nn,nu,ss)
+model_llik <- function(model,pars,nn,nu,ss,apl)
 {
    llik <- 0;
    if(!all(nu == round(nu))) {
@@ -260,9 +263,21 @@ model_llik <- function(model,pars,nn,nu,ss)
    }
    estot <- model_estot(pars,qq);
    lesk <- rep(0,length(nu));
-   for(cnt in 1:length(nu))
+   if(length(nu) <= apl) {
+      for(cnt in 1:length(nu))
+      {
+         lesk[cnt] <- model_lesk(pars,qq,k = nu[cnt]);
+      }
+   } else
    {
-      lesk[cnt] <- model_lesk(pars,qq,k = nu[cnt]);
+      lo <- log10(min(nu)) - 2;
+      nua <- 10^seq(from = lo, to = 0, length.out = 101);
+      leska <- rep(0,length(nua));
+      for(cnt in 1:length(nua)) {
+         leska[cnt] <- model_lesk(pars,qq,k = nua[cnt]);
+      }
+      leskfun <- splinefun(x = log(nua), y = leska);
+      lesk <- leskfun(log(nu));
    }
    llik <- llik - estot + sum(ss * lesk) - (!rel_abund) * sum(lgamma(ss + 1));
    return(llik);
