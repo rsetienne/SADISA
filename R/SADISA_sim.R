@@ -140,7 +140,13 @@ ms_sim <- function(parsmc,ii,qq,model)
       return(exp(model_es0_int(x,parsmc,ii,qq)))
    }
    es0 <- stats::integrate(f = ff,lower = 0,upper = 1,rel.tol = 1e-9,abs.tol = 0)$value;
-   nx <- stats::rpois(n = length(es0),es0);
+   nx <- 0;
+   while(nx == 0)
+   {
+      nx <- stats::rpois(n = length(es0),es0);
+      if(nx < 10 & nx > 0) warning(paste('A community with', nx, 'species was generated. Note that SADISA was not designed for low-richness communities.'));
+      if(nx == 0) warning(paste('A community with', nx, 'species was generated. A new community is sampled, but note that SADISA was not designed for low-richness communities.'));
+   }
    xs <- rep(0,nx);
    for(cnt in 1:nx)
    {
