@@ -1,7 +1,7 @@
 #' @title Simulates species abundance data
 #' @description Simulates species abundance data using the independent-species approach
-#' @param parsmc The model parameters. For the point mutation (pm) model this is theta and I. For the protracted
-#' model (pr) this is theta, phi and I. For the density-dependent model (dd) - which can also be interpreted as
+#' @param parsmc The model parameters. For the point mutation (pm) model this is theta. For the protracted
+#' model (pr) this is theta and phi. For the density-dependent model (dd) - which can also be interpreted as
 #' the per-species speciation model, this is theta and alpha.
 #' @param ii The I parameter. When I is a vector, it is assumed that each value
 #' describes a sample or a guild depending on whether mult == 'ms' or mult == 'mg'. When mult = 'both',
