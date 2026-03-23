@@ -254,7 +254,7 @@ model_llik <- function(model,pars,nn,nu,ss,apl)
    if(model[2] == 'dd')
    {
       funzero <- function(x) ldd_ejtot(pars = pars,qq = x) - j;
-      reszero <- stats::uniroot(f = funzero,interval = c(1e-5,1-1e-5), tol = 1e-10);
+      reszero <- stats::uniroot(f = funzero,interval = c(1e-8,1-1e-8), tol = .Machine$double.eps);
       qq <- reszero$root;
    } else
    if(model[2] == 'ss')
