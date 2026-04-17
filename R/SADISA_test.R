@@ -211,7 +211,7 @@ SADISA_test <- function(tol = 1E-3)
    result <- SADISA_loglik(abund = ps, pars = c(th, ii, jj), model = c('pm','dl'))
    testthat::expect_equal(result, 735.4226333098715713, tol = 1E-6)
 
-   cat('\n\nTesting for apprxomation:\n')
+   cat('\n\nTesting for approximation:\n')
    ps <- 10^(seq(from = -10,to = -1,length.out = 150));
    th <- 1e2;
    ii <- 1e4;

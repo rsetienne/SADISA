@@ -34,7 +34,7 @@
 #' @export
 SADISA_sim <- function(parsmc,ii,jj,model = c('pm','dl'),mult = 'single',nsim = 1)
 {
-   if(!((model[1] == 'pm' | model[1] == 'pr' | model[1] == 'dd') & model[2] == 'dl'))
+   if(!((model[1] == 'pm' | model[1] == 'pr' | model[1] == 'dd' | model == 'rf') & model[2] == 'dl'))
    {
       stop('Simulations for this metacommunity model is not implemented yet.');
    }
