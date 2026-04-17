@@ -132,6 +132,11 @@ ms_sim <- function(parsmc,ii,qq,model)
    {
       if(parsmc[1] < 0 | parsmc[2] > 1 | min(unlist(ii)) < 0) stop('Parameters, except alpha, should be positive; alpha cannot be larger than 1.');
       model_es0_int <- dd_estot_int;
+   } else
+   if(model[1] == 'rf')
+   {
+      if(parsmc[1] < 0 | min(unlist(ii)) < 0) stop('Parameters should be positive.');
+      model_es0_int <- rf_estot_int;
    }
 
    # sample metacommunity abundances
@@ -236,6 +241,11 @@ pm_estot_int <- function(x,parsmc,ii,qq)
 dd_estot_int <- function(x,parsmc,ii,qq)
 {
    return(mdd_lestot_int(x,c(parsmc,ii),qq))
+}
+
+rf_estot_int <- function(x,parsmc,ii,qq)
+{
+   return(rf_lestot_int(x,c(parsmc,ii),qq))
 }
 
 pr_estot_int <- function(x,parsmc,ii,qq)

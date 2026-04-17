@@ -25,3 +25,23 @@ rf_lesk_int <- function(x,pars,qq,k)
    y <- y + k * log(qq) - lgamma(k + 1) + 2 * log(ph);
    return(y);
 }
+
+rf_lestot_int <- function(x,pars,qq)
+{
+   ph <- pars[1];
+   ii <- pars[2:length(pars)];
+   iiqq <- -sum(ii * log(1 - qq));
+   y <- rep(0,length(x));
+   for(cnt in 1:length(x))
+   {
+      if(x[cnt] > 0)
+      {
+         y[cnt] <- logminexpm1approx(iiqq,x[cnt],1) - th * x[cnt];
+      } else
+      {
+         y[cnt] <- -Inf;
+      }
+   }
+   y <- y + 2 * log(ph);
+   return(y);
+}
