@@ -36,7 +36,7 @@ rf_lestot_int <- function(x,pars,qq)
    {
       if(x[cnt] > 0)
       {
-         y[cnt] <- logminexpm1approx(iiqq,x[cnt],1) - th * x[cnt];
+         y[cnt] <- logminexpm1approx(iiqq,x[cnt],1) - ph * x[cnt];
       } else
       {
          y[cnt] <- -Inf;
